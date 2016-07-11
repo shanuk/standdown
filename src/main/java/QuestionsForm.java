@@ -72,7 +72,7 @@ public class QuestionsForm {
       @Override
       public void actionPerformed(ActionEvent e) {
         try {
-          openWebpage(new URL("https://api.slack.com/docs/oauth-test-tokens?team_id=T0XDQ8STH&action=issue&sudo=1").toURI());
+          openWebpage(new URL("https://api.slack.com/docs/oauth-test-tokens?action=issue&sudo=1").toURI());
         } catch (Exception ignore){}
       }
     });
