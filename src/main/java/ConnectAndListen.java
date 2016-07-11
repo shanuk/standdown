@@ -66,54 +66,53 @@ public class ConnectAndListen
 //        log("user changed: event="+event);
       }
     });
-    ses.connect();
-    logform.setDisconnectObserver(new Observer() {
-      @Override
-      public void update(Observable o, Object arg) {
-        semaphore.release();
-      }
-    });
-    ses.addMessagePostedListener(new SlackMessagePostedListener() {
-      @Override
-      public void onEvent(SlackMessagePosted event, SlackSession session) {
-        String msg = event.getMessageContent();
-        log("onEvent(): incoming="+event);
-//        log("onEvent(): channelID="+event.getChannel().getId()+" chName="+event.getChannel().getName()+" msg=["+msg+"]");
-        SlackChannel ch = event.getChannel();
-        if (!msg.contains(me.getId())) {
-          log("MSG not for me");
-          return;
+    try {
+      ses.connect();
+      logform.setDisconnectObserver(new Observer() {
+        @Override
+        public void update(Observable o, Object arg) {
+          semaphore.release();
         }
-        if (expectedMsg == States.STATE_YES && msg.contains(PROMPT_YES)){
-          ses.sendMessage(ch, "-yes");
-          expectedMsg = States.STATE_1;
+      });
+      ses.addMessagePostedListener(new SlackMessagePostedListener() {
+        @Override
+        public void onEvent(SlackMessagePosted event, SlackSession session) {
+          String msg = event.getMessageContent();
+          log("onEvent(): incoming="+event);
+  //        log("onEvent(): channelID="+event.getChannel().getId()+" chName="+event.getChannel().getName()+" msg=["+msg+"]");
+          SlackChannel ch = event.getChannel();
+          if (!msg.contains(me.getId())) {
+            log("MSG not for me");
+            return;
+          }
+          if (expectedMsg == States.STATE_YES && msg.contains(PROMPT_YES)){
+            ses.sendMessage(ch, "-yes");
+            expectedMsg = States.STATE_1;
+          }
+          else if (expectedMsg == States.STATE_1 && msg.contains(PROMPT_1)){
+            ses.sendMessage(ch, yesterdayReport);
+            expectedMsg = States.STATE_2;
+          }
+          else if (expectedMsg == States.STATE_2 && msg.contains(PROMPT_2)){
+            ses.sendMessage(ch, todayReport);
+            expectedMsg = States.STATE_3;
+          }
+          else if (expectedMsg == States.STATE_3 && msg.contains(PROMPT_3)){
+            ses.sendMessage(ch, blocking);
+            JOptionPane.showMessageDialog(logform.getFrame(), "Answered all questions. Please check in channel");
+            log("releasing semaphore.");
+            semaphore.release(); //exit
+          }
         }
-        else if (expectedMsg == States.STATE_1 && msg.contains(PROMPT_1)){
-          ses.sendMessage(ch, yesterdayReport);
-          expectedMsg = States.STATE_2;
-        }
-        else if (expectedMsg == States.STATE_2 && msg.contains(PROMPT_2)){
-          ses.sendMessage(ch, todayReport);
-          expectedMsg = States.STATE_3;
-        }
-        else if (expectedMsg == States.STATE_3 && msg.contains(PROMPT_3)){
-          ses.sendMessage(ch, blocking);
-          JOptionPane.showMessageDialog(logform.getFrame(), "Answered all questions. Please check in channel");
-          log("releasing semaphore.");
-          semaphore.release(); //exit
-        }
-      }
-    });
-/*
-    Collection<SlackChannel> channels = ses.getChannels();
-    log("Channels: ");
-    for (SlackChannel ch : channels){
-      log((ch.isDirect()?"-" : "+")+" ["+ch.getId()+"] "+ch.getName()+"");
+      });
+      semaphore.acquire();
+      log("Shutting down");
+      ses.disconnect();
+    } catch (Exception e) {
+      e.printStackTrace();
+      log("Error while connecting: "+e.getMessage());
+      JOptionPane.showMessageDialog(logform.getFrame(), "Error while connecting, see details:\n"+e.getMessage());
     }
-*/
-    semaphore.acquire();
-    log("Shutting down");
-    ses.disconnect();
   }
 
   public static void main(String[] args) throws IOException, InterruptedException {
