@@ -28,9 +28,6 @@ public class ConnectAndListen
   private static final String PROMPT_3 = "3. Is there anything standing in your way?";
   private static final String PROMPT_YES = "Welcome to daily standup! Are you ready to begin? ('-yes', or '-skip')";
 
-  private final String TOKEN="xoxp-31466298935-55653482883-57160937395-d1078412aa",
-      OLD_TEAM_TOKEN="xoxp-47614420802-47877575957-51873672933-1f685d8031";
-
   private SlackPersona me;
   private States expectedMsg = States.STATE_YES;
   private LogForm logform = new LogForm();
