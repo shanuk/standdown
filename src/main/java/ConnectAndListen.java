@@ -23,7 +23,7 @@ import java.util.concurrent.Semaphore;
 public class ConnectAndListen
 {
 
-  private static final String PROMPT_1 = "1. What did you do yesterday?";
+  private static final String PROMPT_1 = "1. What did you do";
   private static final String PROMPT_2 = "2. What are you working on today?";
   private static final String PROMPT_3 = "3. Is there anything standing in your way?";
   private static final String PROMPT_YES = "Welcome to daily standup! Are you ready to begin? ('-yes', or '-skip')";
