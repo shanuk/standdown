@@ -17,6 +17,11 @@ task fatJar(type: Jar) {
     with jar
 }
 
+task run(type:JavaExec) {
+   main = 'ConnectAndListen'
+   classpath = sourceSets.main.runtimeClasspath
+}
+
 repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
@@ -24,5 +29,4 @@ repositories {
 
 dependencies {
     compile 'com.github.Ullink:simple-slack-api:-SNAPSHOT'
-//    compile project(':api')
 }
